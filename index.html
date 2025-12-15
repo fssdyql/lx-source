@@ -9,8 +9,9 @@ body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#f8fafc;c
 .box{max-width:900px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.05);overflow:hidden;border:1px solid #e2e8f0}
 .h{padding:24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;background:#fff}
 .h h1{font-size:18px;margin:0;color:#0f172a}
-.tabs{background:#f1f5f9;display:flex;gap:4px;padding:10px 20px 0;overflow-x:auto}
-.tab{padding:10px 20px;cursor:pointer;font-weight:600;color:#64748b;border-radius:8px 8px 0 0;font-size:14px;transition:0.2s}
+.tabs{background:#f1f5f9;display:flex;gap:4px;padding:10px 20px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 20px;cursor:pointer;font-weight:600;color:#64748b;border-radius:8px 8px 0 0;font-size:14px;transition:0.2s;white-space:nowrap;flex-shrink:0}
 .tab:hover{background:#e2e8f0;color:#334155}
 .tab.active{background:#fff;color:#2563eb;box-shadow:0 -4px 6px -1px rgba(0,0,0,0.02)}
 .list{padding:0}
@@ -36,6 +37,28 @@ tr:hover{background:#f8fafc}
 .key-btn{padding:0 12px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;font-weight:bold;color:#475569}
 .key-btn:hover{background:#e2e8f0;color:#2563eb}
 .empty{padding:60px;text-align:center;color:#94a3b8}
+
+/* 移动端适配 CSS */
+@media (max-width: 640px) {
+    body { padding: 12px; background: #f1f5f9; }
+    .box { border: none; box-shadow: none; background: transparent; overflow: visible; }
+    .h { padding: 16px; border-radius: 12px; margin-bottom: 12px; flex-direction: column; align-items: flex-start; gap: 8px; border: 1px solid #e2e8f0; }
+    .tabs { padding: 0; background: transparent; gap: 8px; margin-bottom: 12px; }
+    .tab { border-radius: 8px; border: 1px solid transparent; padding: 8px 16px; background: #e2e8f0; opacity: 0.7; }
+    .tab.active { opacity: 1; border-color: #cbd5e1; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    
+    /* 表格转卡片视图 */
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tr { background: #fff; margin-bottom: 12px; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+    td { padding: 0; border: none; margin-bottom: 12px; }
+    td:last-child { margin-bottom: 0; }
+    
+    .btn-row { flex-direction: column; }
+    .btn-lnk { display: flex; width: 100%; box-sizing: border-box; justify-content: center; margin-right: 0; margin-bottom: 6px; }
+    .key-row { flex-direction: column; }
+    .key-btn { padding: 8px; margin-top: 4px; width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -61,7 +84,7 @@ function rL(){
     const l = DB.items.filter(i=>(i.tab||'LX')===cur);
     const b = document.getElementById('c');
     if(!l.length){b.innerHTML='<div class="empty">暂无内容</div>';return;}
-    let h='<table>';
+    let h='<table><thead><tr><th>信息</th><th>详情</th><th>操作</th></tr></thead><tbody>';
     h+=l.map(i=>{
         let meta='';
         if(i.quality) meta+='<span class="tag">'+i.quality+'</span>';
@@ -81,16 +104,16 @@ function rL(){
             const sv = (cur==='LX' && k.enableVar && k.var);
             if(su || sv) {
                 act += '<div class="key-box">';
-                if(su) act += '<div class="key-row"><input class="key-in" id="ku_'+i.id+'" placeholder="输入Key在线导入"><button class="key-btn" onclick="KU('+i.id+')">➡️</button></div>';
-                if(sv) act += '<div class="key-row"><input class="key-in" id="kv_'+i.id+'" placeholder="输入Key生成文件"><button class="key-btn" onclick="KV('+i.id+')">⬇️</button></div>';
+                if(su) act += '<div class="key-row"><input class="key-in" id="ku_'+i.id+'" placeholder="输入Key在线导入"><button class="key-btn" onclick="KU('+i.id+')">➡️ 导入</button></div>';
+                if(sv) act += '<div class="key-row"><input class="key-in" id="kv_'+i.id+'" placeholder="输入Key生成文件"><button class="key-btn" onclick="KV('+i.id+')">⬇️ 生成</button></div>';
                 act += '</div>';
             }
         }
         act += '</div>';
 
-        return '<tr><td><div style="font-weight:bold;font-size:15px;margin-bottom:6px;color:#1e293b">'+i.name+'</div>'+meta+'</td><td style="color:#64748b;font-size:13px;line-height:1.5">'+(i.note||'-')+'<br><div style="margin-top:8px">'+ls+'</div></td><td width="260">'+act+'</td></tr>';
+        return '<tr><td><div style="font-weight:bold;font-size:16px;margin-bottom:8px;color:#1e293b">'+i.name+'</div>'+meta+'</td><td style="color:#64748b;font-size:13px;line-height:1.6">'+(i.note||'<span style="opacity:0.5">无备注</span>')+'<br><div style="margin-top:10px">'+ls+'</div></td><td width="260">'+act+'</td></tr>';
     }).join('');
-    b.innerHTML = h+'</table>';
+    b.innerHTML = h+'</tbody></table>';
 }
 window.D=id=>{const i=DB.items.find(x=>x.id==id); save(i.file.content,i.name);};
 window.KU=id=>{const i=DB.items.find(x=>x.id==id);const v=document.getElementById('ku_'+id).value; if(v)window.open(i.keyConfig.url+v);};
